@@ -30,8 +30,6 @@ export const FieldBlur = observer((props: FieldProps) => (
     value={props.fieldState.value}
     onChange={function() { props.fieldState.onChange(arguments[1]) }}
     errorText={props.fieldState.error}
-
-    /** Always validate on blur */
     onBlur={props.fieldState.enableAutoValidationAndValidate}
   />
 ));

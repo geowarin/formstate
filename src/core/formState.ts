@@ -3,13 +3,13 @@ import { ComposibleValidatable, Validator, applyValidators } from './types';
 
 /** Each key of the object is a validatable */
 export type ValidatableMapOrArray =
-  { [key: string]: ComposibleValidatable<any> }
-  | ComposibleValidatable<any>[]
+  { [key: string]: ComposibleValidatable<any, any> }
+  | ComposibleValidatable<any, any>[]
 
 /**
  * Just a wrapper around the helpers for a set of FieldStates or FormStates
  */
-export class FormState<TValue extends ValidatableMapOrArray> implements ComposibleValidatable<TValue> {
+export class FormState<TValue extends ValidatableMapOrArray> implements ComposibleValidatable<TValue, string> {
   protected mode: 'array' | 'map' = 'map';
   constructor(
     /**
@@ -26,7 +26,7 @@ export class FormState<TValue extends ValidatableMapOrArray> implements Composib
   }
 
   /** Get validatable objects from $ */
-  protected getValues = (): ComposibleValidatable<any>[] => {
+  protected getValues = (): ComposibleValidatable<any, any>[] => {
     if (this.mode === 'array') return (this.$ as any);
     const keys = Object.keys(this.$);
     return keys.map((key) => this.$[key]);
@@ -34,8 +34,8 @@ export class FormState<TValue extends ValidatableMapOrArray> implements Composib
 
   @observable validating = false;
 
-  protected _validators: Validator<TValue>[] = [];
-  @action validators = (...validators: Validator<TValue>[]) => {
+  protected _validators: Validator<TValue, string>[] = [];
+  @action validators = (...validators: Validator<TValue, string>[]) => {
     this._validators = validators;
     return this;
   }
@@ -156,7 +156,7 @@ export class FormState<TValue extends ValidatableMapOrArray> implements Composib
   /**
    * Composible field validation tracking
    */
-  @observable validatedSubFields: ComposibleValidatable<any>[] = [];
+  @observable validatedSubFields: ComposibleValidatable<any, any>[] = [];
 
   /**
    * Composible fields (fields that work in conjuction with FormState)

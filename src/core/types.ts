@@ -2,8 +2,8 @@ import * as utils from '../internal/utils';
 
 
 /** A truthy string or falsy values */
-export type ValidationResponse =
-  string
+export type ValidationResponse<TValidation> =
+  TValidation
   | null
   | undefined
   | false
@@ -12,15 +12,15 @@ export type ValidationResponse =
  * A validator simply takes a value and returns a string or Promise<string>
  * If a truthy string is returned it represents a validation error
  **/
-export interface Validator<TValue> {
-  (value: TValue): ValidationResponse | Promise<ValidationResponse>;
+export interface Validator<TValue, TValidation> {
+  (value: TValue): ValidationResponse<TValidation> | Promise<ValidationResponse<TValidation>>;
 }
 
 /**
  * Runs the value through a list of validators. As soon as a validation error is detected, the error is returned
  */
-export function applyValidators<TValue>(value: TValue, validators: Validator<TValue>[]): Promise<string | null | undefined> {
-  return new Promise<string | null | undefined>(resolve => {
+export function applyValidators<TValue, TValidation>(value: TValue, validators: Validator<TValue, TValidation>[]): Promise<TValidation | null | undefined> {
+  return new Promise<TValidation | null | undefined>(resolve => {
     let currentIndex = 0;
 
     let gotoNextValidator = () => {
@@ -62,11 +62,11 @@ export function applyValidators<TValue>(value: TValue, validators: Validator<TVa
 
 
 /** Anything that provides this interface can be plugged into the validation system */
-export interface Validatable<TValue> {
+export interface Validatable<TValue, TValidation> {
   validating: boolean;
   validate(): Promise<{ hasError: true } | { hasError: false, value: TValue }>;
   hasError: boolean;
-  error?: string | null | undefined;
+  error?: TValidation | null | undefined;
   $: TValue;
   enableAutoValidation: () => void;
 }
@@ -74,7 +74,7 @@ export interface Validatable<TValue> {
 /**
  * Composible fields (fields that work in conjuction with a parent FormState)
  */
-export interface ComposibleValidatable<TValue> extends Validatable<TValue> {
+export interface ComposibleValidatable<TValue, TValidation> extends Validatable<TValue, TValidation> {
   /** Used to tell the parent about validation */
   on$ChangeAfterValidation: () => void;
   on$Reinit: () => void;

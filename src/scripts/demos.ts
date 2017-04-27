@@ -112,6 +112,16 @@ export function buildDemos() {
       entryPointPath: __dirname + '/demos/07 cross.tsx',
       height: '300px',
     });
+
+    eze.md(`
+    # Custom validation
+    
+    You can specify the type returned by validators if you wish
+    `);
+    eze.app({
+      entryPointPath: __dirname + '/demos/08 typed-validation.tsx',
+      height: '300px',
+    });
   });
 }
 

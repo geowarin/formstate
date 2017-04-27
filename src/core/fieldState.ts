@@ -7,14 +7,14 @@ import { debounce } from '../internal/utils';
  *
  * This is the glue between the *page* and *field* in the presence of invalid states.
  */
-export class FieldState<TValue> implements ComposibleValidatable<TValue> {
+export class ValidateFieldState<TValue, TValidation> implements ComposibleValidatable<TValue, TValidation> {
   /**
    * The value you should bind to the input in your field.
    */
   @observable value: TValue;
 
   /** If there is any error on the field on last validation attempt */
-  @observable error?: string;
+  @observable error?: TValidation;
 
 
   /** If the field has been touched */
@@ -67,13 +67,13 @@ export class FieldState<TValue> implements ComposibleValidatable<TValue> {
     })
   }
 
-  protected _validators: Validator<TValue>[] = [];
-  @action validators = (...validators: Validator<TValue>[]) => {
+  protected _validators: Validator<TValue, TValidation>[] = [];
+  @action validators = (...validators: Validator<TValue, TValidation>[]) => {
     this._validators = validators;
     return this;
   }
-  protected _onUpdate: (state: FieldState<TValue>) => any;
-  @action public onUpdate = (handler: (state: FieldState<TValue>) => any) => {
+  protected _onUpdate: (state: ValidateFieldState<TValue, TValidation>) => any;
+  @action public onUpdate = (handler: (state: ValidateFieldState<TValue, TValidation>) => any) => {
     this._onUpdate = handler;
     return this;
   }
@@ -135,7 +135,7 @@ export class FieldState<TValue> implements ComposibleValidatable<TValue> {
     this.validating = true;
     const value = this.value;
     return applyValidators(this.value, this._validators || [])
-      .then(action((fieldError: string) => {
+      .then(action((fieldError: TValidation) => {
 
         /**
          * If validation comes back out of order then the result of this validation is not siginificant
@@ -220,3 +220,5 @@ export class FieldState<TValue> implements ComposibleValidatable<TValue> {
     this.on$Reinit = config.on$Reinit;
   }
 }
+
+export class FieldState<TValue> extends ValidateFieldState<TValue, string> {}

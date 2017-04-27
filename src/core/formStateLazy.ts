@@ -2,12 +2,12 @@ import { observable, action, computed, runInAction } from 'mobx';
 import { Validatable, Validator, applyValidators } from './types';
 
 /** Each item in the array is a validatable */
-export type ValidatableArray = Validatable<any>[];
+export type ValidatableArray = Validatable<any, any>[];
 
 /**
  * Makes it easier to work with dynamically maintained array
  */
-export class FormStateLazy<TValue extends ValidatableArray> implements Validatable<TValue> {
+export class FormStateLazy<TValue extends ValidatableArray> implements Validatable<TValue, string> {
   @computed get $() {
     return this.getFields();
   }
@@ -18,8 +18,8 @@ export class FormStateLazy<TValue extends ValidatableArray> implements Validatab
 
   @observable validating = false;
 
-  protected _validators: Validator<TValue>[] = [];
-  @action validators = (...validators: Validator<TValue>[]) => {
+  protected _validators: Validator<TValue, string>[] = [];
+  @action validators = (...validators: Validator<TValue, string>[]) => {
     this._validators = validators;
     return this;
   }
